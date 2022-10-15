@@ -6,6 +6,7 @@ catalog = [
         'price': 100,
         'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem.",
         'availableUnits': 12,
+        'category': "men"
     },
     {
         'id': 2,
@@ -14,6 +15,7 @@ catalog = [
         'price': 200,
         'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem.",
         'availableUnits': 10,
+        'category': "men"
     },
     {
         'id': 3,
@@ -22,6 +24,7 @@ catalog = [
         'price': 300,
         'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem.",
         'availableUnits': 5,
+        'category': "women"
     },
     {
         'id': 4,
@@ -30,6 +33,7 @@ catalog = [
         'price': 400,
         'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem.",
         'availableUnits': 2,
+        'category': "women"
     },
     {
         'id': 5,
@@ -38,6 +42,7 @@ catalog = [
         'price': 500,
         'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem.",
         'availableUnits': 1,
+        'category': "men"
     },
     {
         'id': 6,
@@ -46,6 +51,7 @@ catalog = [
         'price': 600,
         'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem.",
         'availableUnits': 11,
+        'category': "men"
     },
     {
         'id': 7,
@@ -54,6 +60,7 @@ catalog = [
         'price': 700,
         'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem.",
         'availableUnits': 8,
+        'category': "men"
     },
     {
         'id': 8,
@@ -62,5 +69,6 @@ catalog = [
         'price': 800,
         'description': "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem. Sed euismod, nunc ut aliquam aliquam, nunc nisl aliquet nisl, eget aliquam nisl nisl sit amet lorem.",
         'availableUnits': 7,
+        'category': "women"
     }
 ]
