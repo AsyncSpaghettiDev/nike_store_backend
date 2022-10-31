@@ -2,6 +2,7 @@ from flask import Flask, request, abort
 import json
 from config import me, hello, db
 from mock_data import catalog
+from bson import ObjectId
 
 app = Flask('server')
 
@@ -46,8 +47,8 @@ def fix_id(obj):
     return obj
 
 
-def get_catalog_products():
-    products = db.products.find()
+def get_catalog_products(conditions={}):
+    products = db.products.find(conditions)
     products = [fix_id(p) for p in products]
     return products
 
@@ -65,6 +66,9 @@ def add_product():
     if product is None:
         abort(400, 'No product required')
 
+    # add the product to the database
+    product['category'] = product['category'].lower()
+
     print('----------')
     db.products.insert_one(product)
     print('----------')
@@ -73,6 +77,47 @@ def add_product():
 
     return json.dumps(product)
 
+# put /api/catalog
+
+
+@app.put('/api/catalog')
+def update_product():
+    # get the data from the request
+    product = request.get_json()
+
+    if product is None:
+        abort(400, 'No product to update')
+
+    id = product.pop('_id')
+
+    # update the product in the database
+    product['category'] = product['category'].lower()
+
+    res = db.products.update_one({'_id': ObjectId(id)}, {'$set': product})
+
+    return json.dumps("Product updated")
+
+# delete /api/catalog
+
+
+@app.delete('/api/catalog/<id>')
+def delete_product(id):
+    # delete the product from the database
+    db.products.delete_one({'_id': ObjectId(id)})
+
+    return json.dumps("Product deleted")
+
+# get /api/catalog/details/<id>
+
+
+@app.get('/api/catalog/details/<id>')
+def get_product_details(id):
+    product = db.products.find_one({'_id': ObjectId(id)})
+    product = fix_id(product)
+    if product is None:
+        abort(404, 'Product not found')
+
+    return json.dumps(product)
 
 # get /api/products/count
 # return the number of products in the catalog
@@ -100,11 +145,8 @@ def get_products_total():
 
 @app.get('/api/catalog/categories/<category>')
 def get_products_by_category(category):
-    products = []
-    category = category.lower()
-    for product in get_catalog_products():
-        if product['category'].lower() == category:
-            products.append(product)
+    products = get_catalog_products({'category': category})
+
     return json.dumps(products)
 
 # get /api/catalog/lower/<amount>
@@ -113,22 +155,26 @@ def get_products_by_category(category):
 
 @app.get('/api/catalog/lower/<amount>')
 def get_products_lower_than(amount):
-    products = []
-    for product in get_catalog_products():
-        if product['price'] < float(amount):
-            products.append(product)
+    products = get_catalog_products({'price': {'$lt': float(amount)}})
+
     return json.dumps(products)
 
-# get /api/category/unique
+# create an endpoint that allow us retrieve product with prices greater or equal than a given amount
+
+
+@app.get('/api/catalog/greater/<amount>')
+def get_products_greater_than(amount):
+    products = get_catalog_products({'price': {'$gte': float(amount)}})
+
+    return json.dumps(products)
+
+# get /api/catalog/category/unique
 # return all the unique categories in the catalog
 
 
-@app.get('/api/category/unique')
+@app.get('/api/catalog/category/unique')
 def get_unique_categories():
-    categories = []
-    for product in get_catalog_products():
-        if product['category'] not in categories:
-            categories.append(product['category'])
+    categories = db.products.distinct('category')
     return json.dumps(categories)
 
 
