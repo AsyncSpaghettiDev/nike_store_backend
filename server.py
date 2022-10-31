@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, request, abort
 import json
-from config import me, hello
+from config import me, hello, db
 from mock_data import catalog
 
 app = Flask('server')
@@ -41,27 +41,56 @@ def version():
 # get /api/catalog
 
 
+def fix_id(obj):
+    obj['_id'] = str(obj['_id'])
+    return obj
+
+
+def get_catalog_products():
+    products = db.products.find()
+    products = [fix_id(p) for p in products]
+    return products
+
+
 @app.get('/api/catalog')
 def get_catalog():
-    return json.dumps(catalog)
+    return json.dumps(get_catalog_products())
+
+
+@app.post('/api/catalog')
+def add_product():
+    # get the data from the request
+    product = request.get_json()
+
+    if product is None:
+        abort(400, 'No product required')
+
+    print('----------')
+    db.products.insert_one(product)
+    print('----------')
+
+    product['_id'] = str(product['_id'])
+
+    return json.dumps(product)
+
 
 # get /api/products/count
 # return the number of products in the catalog
 
 
-@app.get('/api/products/count')
+@app.get('/api/catalog/count')
 def get_products_count():
-    total_products = len(catalog)
+    total_products = db.products.count_documents({})
     return json.dumps({'total_products': total_products})
 
 # get /api/products/total
 # return the sum of all the prices of the products in the catalog
 
 
-@app.get('/api/products/total')
+@app.get('/api/catalog/total')
 def get_products_total():
     total = 0
-    for product in catalog:
+    for product in get_catalog_products():
         total += product['price']
     return json.dumps({'total': total})
 
@@ -69,11 +98,11 @@ def get_products_total():
 # return all the products that below to the received category
 
 
-@app.get('/api/products/categories/<category>')
+@app.get('/api/catalog/categories/<category>')
 def get_products_by_category(category):
     products = []
     category = category.lower()
-    for product in catalog:
+    for product in get_catalog_products():
         if product['category'].lower() == category:
             products.append(product)
     return json.dumps(products)
@@ -85,7 +114,7 @@ def get_products_by_category(category):
 @app.get('/api/catalog/lower/<amount>')
 def get_products_lower_than(amount):
     products = []
-    for product in catalog:
+    for product in get_catalog_products():
         if product['price'] < float(amount):
             products.append(product)
     return json.dumps(products)
@@ -97,7 +126,7 @@ def get_products_lower_than(amount):
 @app.get('/api/category/unique')
 def get_unique_categories():
     categories = []
-    for product in catalog:
+    for product in get_catalog_products():
         if product['category'] not in categories:
             categories.append(product['category'])
     return json.dumps(categories)
@@ -125,4 +154,4 @@ def count_colors(color):
     return json.dumps({'count': count})
 
 
-app.run(debug=True)
+# app.run(debug=True)
