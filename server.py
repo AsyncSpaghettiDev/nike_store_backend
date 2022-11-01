@@ -63,15 +63,34 @@ def add_product():
     # get the data from the request
     product = request.get_json()
 
+    # should be a title
+    # the title should have at least 5 chars
+
+    # should be a category
+
+    # should be a price
+    # the price should be a number (int or float)
+    # the number should be greater than 0
+
     if product is None:
         abort(400, 'No product required')
+
+    if not product.get('title') or len(product['title']) < 5:
+        abort(400, 'Title is required and must be at least 5 characters long')
+
+    if not product.get('category'):
+        abort(400, 'Category is required')
+
+    if not product.get('price') or product['price'] <= 0:
+        abort(400, 'Price is required and must be greater than 0')
+
+    if product.get('price') and not isinstance(product['price'], (int, float)):
+        abort(400, 'Price must be a number')
 
     # add the product to the database
     product['category'] = product['category'].lower()
 
-    print('----------')
     db.products.insert_one(product)
-    print('----------')
 
     product['_id'] = str(product['_id'])
 
@@ -177,27 +196,87 @@ def get_unique_categories():
     categories = db.products.distinct('category')
     return json.dumps(categories)
 
+# create a post on /api/coupons
+# should receive a coupon object with code and discount
+# should save the coupon in the database
+# should return the coupon
 
-@app.get('/api/test/colors')
-def unique_colors():
-    colors = ["red", 'blue', "Pink", "yelloW", "Red",
-              "Black", "BLUE", "RED", "BLACK", "YELLOW"]
-    unique_colors = []
-    for color in colors:
-        if color.lower() not in unique_colors:
-            unique_colors.append(color.lower())
-    return json.dumps(unique_colors)
+# validate that there is a coupon discount in the request
+# validate that the coupon has a code
+# validate that the coupon has a discount
 
 
-@app.get('/api/test/count/<color>')
-def count_colors(color):
-    colors = ["red", 'blue', "Pink", "yelloW", "Red",
-              "Black", "BLUE", "RED", "BLACK", "YELLOW"]
-    count = 0
-    for c in colors:
-        if c.lower() == color.lower():
-            count += 1
-    return json.dumps({'count': count})
+def get_all_coupons(conditions={}):
+    coupons = db.coupons.find(conditions)
+    coupons = [fix_id(c) for c in coupons]
+    return coupons
 
 
-# app.run(debug=True)
+@app.get('/api/coupons')
+def get_coupons():
+    return json.dumps(get_all_coupons())
+
+
+@app.post('/api/coupons')
+def add_coupon():
+    # get the data from the request
+    coupon = request.get_json()
+
+    # break this condition into 3 different conditions
+    if coupon is None:
+        abort(400, 'Coupon cannot be empty')
+
+    if 'code' not in coupon:
+        abort(400, 'Coupon code is required')
+
+    if 'discount' not in coupon:
+        abort(400, 'Coupon discount is required')
+
+    # validate if discont is a float or number
+    if not isinstance(coupon['discount'], float) and not isinstance(coupon['discount'], int):
+        abort(400, 'The coupon is not valid, the discount should be a number')
+
+    # check if the coupon already exists
+    if len(get_all_coupons({'code': coupon['code']})) > 0:
+        abort(400, 'The coupon already exists')
+
+    # add the coupon to the database
+    db.coupons.insert_one(coupon)
+
+    coupon['_id'] = str(coupon['_id'])
+
+    return json.dumps(coupon)
+
+
+@app.get('/api/coupons/<code>')
+def get_coupon(code):
+    coupon = db.coupons.find_one({'code': code})
+    coupon = fix_id(coupon)
+    if coupon is None:
+        abort(404, 'Invalid coupon')
+
+    return json.dumps(coupon)
+
+
+@app.delete('/api/coupons/<code>')
+def delete_coupon(code):
+    # delete the coupon from the database
+    db.coupons.delete_one({'code': code})
+
+    return json.dumps("Coupon deleted")
+
+
+@app.put('/api/coupons')
+def update_coupon():
+    # get the data from the request
+    coupon = request.get_json()
+
+    if coupon is None:
+        abort(400, 'No coupon to update')
+
+    code = coupon.pop('code')
+
+    # update the coupon in the database
+    res = db.coupons.update_one({'code': code}, {'$set': coupon})
+
+    return json.dumps("Coupon updated")
