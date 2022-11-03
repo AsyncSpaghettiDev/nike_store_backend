@@ -3,8 +3,10 @@ import json
 from config import me, hello, db
 from mock_data import catalog
 from bson import ObjectId
+from flask_cors import CORS
 
 app = Flask('server')
+CORS(app)  # disable CORS for testing, enable it in production
 
 
 @app.get('/')
